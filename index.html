@@ -165,7 +165,7 @@ function updateUI(){
 }
 function renderBook(){
  const grid=$('bookGrid');grid.innerHTML='';const known=fishTypes.filter(f=>(save.caughtCounts[f.id]||0)>0).length;$('bookProgress').textContent=`${known} / ${fishTypes.length} 種`;
- [...fishTypes].sort((a,b)=>(rarityOrder[a.rarity]??99)-(rarityOrder[b.rarity]??99)||a.name.localeCompare(b.name,'ja')).forEach(f=>{const n=save.caughtCounts[f.id]||0,yes=n>0;const el=document.createElement('article');el.className='fishcard';el.innerHTML=`<div class="fishicon ${yes?'':'unknown'}">${yes?f.emoji:'❔'}</div><div><div class="fishname">${yes?f.name:'？？？'}</div><div class="rarity" style="color:${rarityColors[f.rarity]||'#98a89a'}">${yes?f.rarity:'未発見'}</div><div class="fishdesc">${yes?`${f.desc}<br>価格：${f.value.toLocaleString()} G<br>釣った数：${n}匹`:'まだ出会っていない魚'}</div></div>`;grid.appendChild(el);});
+ [...fishTypes].sort((a,b)=>(rarityOrder[a.rarity]??99)-(rarityOrder[b.rarity]??99)||a.value-b.value||a.name.localeCompare(b.name,'ja')).forEach(f=>{const n=save.caughtCounts[f.id]||0,yes=n>0;const el=document.createElement('article');el.className='fishcard';el.innerHTML=`<div class="fishicon ${yes?'':'unknown'}">${yes?f.emoji:'❔'}</div><div><div class="fishname">${yes?f.name:'？？？'}</div><div class="rarity" style="color:${rarityColors[f.rarity]||'#98a89a'}">${yes?f.rarity:'未発見'}</div><div class="fishdesc">${yes?`${f.desc}<br>価格：${f.value.toLocaleString()} G<br>釣った数：${n}匹`:'まだ出会っていない魚'}</div></div>`;grid.appendChild(el);});
 }
 function renderShop(){
  const grid=$('rodGrid');grid.innerHTML='';
