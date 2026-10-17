@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#c8efd9">
-<title>ぽかぽか つりの森 Ver.7</title>
+<title>ぽかぽか つりの森 Ver.8.7</title>
 <style>
 :root{--ink:#35584d;--cream:#fff9e8;--mint:#c8efd9;--green:#3d826d;--pink:#f4a6a0;--gold:#f5ce67}
 *{box-sizing:border-box}
@@ -21,7 +21,10 @@ h1{font-size:19px;line-height:1.2;margin:0;font-weight:900;color:#32675b}
 .panel{display:none;flex:1;gap:10px;flex-direction:column}.panel.active{display:flex}
 .scene{width:100%;border:4px solid #fff8df;border-radius:15px;overflow:hidden;background:#8ed5df;box-shadow:0 4px 0 #b6d9b0,0 0 0 2px #b4d8bd}
 canvas{display:block;width:100%;height:auto;image-rendering:pixelated;touch-action:none}
-.message{min-height:44px;padding:9px 12px;border:2px solid #c4e1bd;border-radius:13px;background:var(--cream);font-size:13px;font-weight:650;line-height:1.45;display:flex;align-items:center}
+.message{min-height:44px;padding:9px 12px;border:2px solid #c4e1bd;border-radius:13px;background:var(--cream);font-size:13px;font-weight:650;line-height:1.45;display:block}
+/* 釣り画面のログ欄は、通常メッセージでも釣果ログでも高さを固定して最大3匹分を確保する。 */
+#message{height:135px;min-height:135px;flex:0 0 135px;overflow-y:auto}
+#message .catch-entry{display:block;min-height:2.9em}
 .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}
 .pad{display:grid;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,42px);gap:5px;justify-content:center}
 button{font:inherit;color:var(--ink);background:var(--cream);border:2px solid #b7d8b8;border-radius:12px;box-shadow:0 3px 0 #a6caa9;touch-action:manipulation;user-select:none;cursor:pointer}
@@ -53,13 +56,13 @@ button:active,button.pressed{transform:translateY(2px);box-shadow:0 1px 0 #a6caa
 </header>
 <section class="panel active" id="gamePage">
  <div class="scene"><canvas id="game" width="480" height="450" aria-label="うさぎの釣り人がいるドット絵の湖"></canvas></div>
+ <div class="message" id="message" aria-live="polite">桟橋まで歩いて、釣りをしてみよう！</div>
  <nav class="tabs">
   <button class="tab active" data-page="game">🌳 つり場</button>
   <button class="tab" data-page="book">📖 さかな図鑑</button>
   <button class="tab" data-page="shop">🛍️ 釣具屋</button>
  </nav>
  <div class="stats"><span class="pill">🪙 <b id="coins">0</b> G</span><span class="pill">🐟 <b id="fishCount">0</b> 匹</span></div>
- <div class="message" id="message" aria-live="polite">桟橋まで歩いて、釣りをしてみよう！</div>
  <section class="controls">
   <div class="pad">
    <button class="empty" tabindex="-1" aria-hidden="true"></button><button class="dir" data-dir="up" aria-label="上へ">▲</button><button class="empty" tabindex="-1" aria-hidden="true"></button>
@@ -82,7 +85,7 @@ button:active,button.pressed{transform:translateY(2px);box-shadow:0 1px 0 #a6caa
  <div class="rodGrid" id="rodGrid"></div>
  <button class="action" data-goto="game">🌳 つり場にもどる</button>
 </section>
-<div class="footer">POKAPOKA FISHING FOREST · AUTO SAVE · VER.7</div>
+<div class="footer">POKAPOKA FISHING FOREST · AUTO SAVE · VER.8.7</div>
 </main>
 <script>
 (()=>{
@@ -121,7 +124,12 @@ const fishTypes=[
 {id:'crystal',name:'クリスタルフィッシュ',value:500,emoji:'🐡',rarity:'伝説',color:'#b8f0e8',base:0.4,desc:'透き通った体が宝石のよう。'},
 {id:'phoenix',name:'ほうおう魚',value:1200,emoji:'🐠',rarity:'神話級',color:'#ef5350',base:0.18,desc:'炎の羽のようなひれを持つ幻の魚。'},
 {id:'unicorn',name:'ユニコーンフィッシュ',value:2500,emoji:'🦄',rarity:'神話級',color:'#ef5350',base:0.10,desc:'虹色の角がきらめく奇跡の魚。'},
-{id:'cosmic',name:'うちゅうの主',value:5000,emoji:'🌌',rarity:'神話級',color:'#ef5350',base:0.045,desc:'星々の海から現れる究極の幻。'}
+{id:'cosmic',name:'うちゅうの主',value:5000,emoji:'🌌',rarity:'神話級',color:'#ef5350',base:0.045,desc:'星々の海から現れる究極の幻。'},
+{id:'amber_minnow',name:'こはくいわし',value:11,emoji:'🐟',rarity:'ふつう',color:'#d7a879',base:1.2,desc:'琥珀色にきらめく小さな魚。'},
+{id:'amago',name:'あまご',value:34,emoji:'🐠',rarity:'ちょっとレア',color:'#7ea7bd',base:0.75,desc:'清流にすむ、斑点模様の魚。'},
+{id:'red_eye',name:'あかめ',value:130,emoji:'🐟',rarity:'レア',color:'#bd777b',base:0.65,desc:'赤く輝く目を持つ珍しい魚。'},
+{id:'jewel_arowana',name:'ほうせきアロワナ',value:420,emoji:'🐠',rarity:'ウルトラレア',color:'#e4b77c',base:0.25,desc:'宝石のようなうろこをまとう魚。'},
+{id:'sacred_whale',name:'せいなるくじら',value:10000,emoji:'🐋',rarity:'神話級',color:'#ef5350',base:0.02,desc:'伝説のさらに先にいる、神聖な巨魚。'}
 ];
 const rods=[
 {name:'はじめての釣り竿',price:0,power:0,desc:'まずはここから。'},
@@ -134,19 +142,20 @@ const rods=[
 {name:'しんぴのロッド',price:2000,power:7,desc:'水面の気配を感じる。'},
 {name:'おうごんロッド',price:3200,power:8,desc:'伝説の魚にも届く性能。'},
 {name:'つきあかりロッド',price:5000,power:9,desc:'最高級。幻の魚を狙おう。'},
-{name:'ほしのきせきロッド',price:12000,power:10,desc:'究極の釣り竿。神話級の魚にも届く。'}
+{name:'ほしのきせきロッド',price:12000,power:10,desc:'究極の釣り竿。神話級の魚にも届く。'},
+{name:'てんくうのしんわロッド',price:20000,power:12,bonus:1.5,desc:'レア魚ボーナス+150%。神話級を狙う最高峰の竿。'}
 ];
 const rarityColors={'ふつう':'#4f9b68','ちょっとレア':'#3986c5','レア':'#9661c9','ウルトラレア':'#e58b32','伝説':'#d34f85','神話級':'#e53935'};
 const rarityOrder={'ふつう':0,'ちょっとレア':1,'レア':2,'ウルトラレア':3,'伝説':4,'神話級':5};
 const defaultSave={coins:100,caughtCounts:{},inventory:[],ownedRods:[0],equippedRod:0,player:{x:240,y:405}};
 let save=loadSave(),mode='idle',biteTimer=null,waitTimer=null;
-let fishingAttempts=0,nextFeverAt=10+Math.floor(Math.random()*11),feverUntil=0,feverTimer=null;
+let fishingAttempts=0,nextFeverAt=10+Math.floor(Math.random()*11),feverCastsRemaining=0,currentCastFever=false;
 const player={...save.player};if(player.y>440){player.y=405;save.player.y=405;}
 const $=id=>document.getElementById(id);
 function loadSave(){try{const raw=localStorage.getItem('pokapokaFishingSaveV2');if(!raw)return JSON.parse(JSON.stringify(defaultSave));const p=JSON.parse(raw);return {...JSON.parse(JSON.stringify(defaultSave)),...p,caughtCounts:p.caughtCounts||{},inventory:Array.isArray(p.inventory)?p.inventory:[],ownedRods:Array.isArray(p.ownedRods)?p.ownedRods:[0],player:{...defaultSave.player,...p.player}};}catch(e){return JSON.parse(JSON.stringify(defaultSave));}}
 function persist(){save.player={x:player.x,y:player.y};try{localStorage.setItem('pokapokaFishingSaveV2',JSON.stringify(save));}catch(e){}updateUI();}
-function say(t){$('message').textContent=t;}
-function sayHTML(t){$('message').innerHTML=t;}
+function say(t){$('message').classList.remove('catch-log');$('message').textContent=t;}
+function sayHTML(t,catchLog=false){$('message').classList.toggle('catch-log',catchLog);$('message').innerHTML=t;}
 function totalCaught(){return Object.values(save.caughtCounts).reduce((a,b)=>a+b,0);}
 function updateUI(){
  $('coins').textContent=save.coins;$('shopCoins').textContent=save.coins;$('fishCount').textContent=totalCaught();
@@ -167,7 +176,7 @@ function renderShop(){
  });
  grid.querySelectorAll('[data-rod]').forEach(btn=>btn.addEventListener('click',()=>rodAction(Number(btn.dataset.rod))));
 }
-function rodBonus(i){return i*0.12;}
+function rodBonus(i){return rods[i].bonus??i*0.12;}
 function rodAction(i){
  if(save.ownedRods.includes(i)){save.equippedRod=i;say(`${rods[i].name}を装備したよ！レアな魚を狙おう。`);persist();return;}
  if(save.coins<rods[i].price){say(`あと${(rods[i].price-save.coins).toLocaleString()} G必要だよ。魚を釣ってお金を貯めよう！`);return;}
@@ -188,7 +197,9 @@ function drawScene(){
  for(let y=96;y<458;y+=28)for(let x=32;x<452;x+=40){const dx=((x+y)%3)*4;rect(x+dx,y,13,3,'#9be0dc');if((x+y)%4===0)rect(x+dx+5,y+9,4,3,'#d1f2d7');}
  // trees along upper edge and sides
  for(const [x,y] of [[30,12],[108,12],[188,12],[344,12],[420,12],[3,180],[3,285],[432,210],[432,300]]){
-  rect(x+7,y+21,9,18,'#a56e4d');rect(x,y+6,22,22,'#4c9b67');rect(x-5,y+12,13,17,'#63ad70');rect(x+12,y+1,15,20,'#79bd76');rect(x+5,y+9,6,4,'#a5d681');
+  // 木を根元を基準に縦方向130%へ拡大
+  ctx.save();ctx.translate(0,y+39);ctx.scale(1,1.3);ctx.translate(0,-(y+39));
+  rect(x+7,y+21,9,18,'#a56e4d');rect(x,y+6,22,22,'#4c9b67');rect(x-5,y+12,13,17,'#63ad70');rect(x+12,y+1,15,20,'#79bd76');rect(x+5,y+9,6,4,'#a5d681');ctx.restore();
  }
  // dock positioned as walkable land extending into lake
  rect(180,348,120,114,'#b98256');for(let x=186;x<300;x+=18){rect(x,352,3,108,'#e0b47a');rect(x+8,353,2,107,'#996344');}
@@ -200,7 +211,9 @@ function drawScene(){
  // 池の名前ラベルは表示しない
  // bunny character, detailed pixel sprite, upright biped
  const x=Math.round(player.x),y=Math.round(player.y);
- rect(x-10,y+17,22,6,'#76b46b'); // shadow
+ rect(x-10,y+17,22,6,'#76b46b'); // shadow stays flat on the ground
+ // ウサギ本体を足元基準に縦方向130%へ拡大
+ ctx.save();ctx.translate(0,y+34);ctx.scale(1,1.3);ctx.translate(0,-(y+34));
  // tall ears
  rect(x-9,y-29,7,23,'#fff8ed');rect(x+2,y-32,7,26,'#fff8ed');
  rect(x-7,y-26,3,17,'#f4a6b2');rect(x+4,y-28,3,18,'#f4a6b2');
@@ -212,8 +225,9 @@ function drawScene(){
  rect(x-7,y+10,14,4,'#f2c75e'); // scarf
  // two legs / little brown boots
  rect(x-8,y+24,6,9,'#fff8ed');rect(x+3,y+24,6,9,'#fff8ed');rect(x-10,y+30,9,4,'#a97858');rect(x+2,y+30,9,4,'#a97858');
+ ctx.restore();
  // little fishing rod and line
- if(Date.now()<feverUntil){
+ if(currentCastFever){
   rect(142,96,196,30,'#fff0a8');rect(146,100,188,22,'#d85c42');ctx.fillStyle='#fffbe9';ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.fillText('🔥 フィーバータイム！',240,116);ctx.textAlign='start';
  }
  if(mode!=='idle'){
@@ -237,35 +251,58 @@ function move(dir){
  persist();
 }
 document.querySelectorAll('[data-dir]').forEach(btn=>{const dir=btn.dataset.dir;let interval=null;const start=e=>{e.preventDefault();move(dir);btn.classList.add('pressed');interval=setInterval(()=>move(dir),130);};const stop=()=>{clearInterval(interval);interval=null;btn.classList.remove('pressed');};btn.addEventListener('pointerdown',start);['pointerup','pointercancel','pointerleave'].forEach(ev=>btn.addEventListener(ev,stop));});
-function getWeights(){
- const bonus=rodBonus(save.equippedRod),fever=Date.now()<feverUntil?2:1;
- // フィーバー中は「ふつう」以外の魚の重みを2倍にして、レア魚全体を釣りやすくする。
- const weights=fishTypes.map(f=>f.base*(f.rarity==='ふつう'?1:(1+bonus)*fever));
- const sum=weights.reduce((a,b)=>a+b,0);
- return weights.map(w=>w/sum*100);
+function feverRarityMultiplier(rarity){
+ // フィーバー中はレア度が高い魚ほど抽選ウェイトを大きくする（神話級は5倍）。
+ return {'ふつう':1,'ちょっとレア':1.8,'レア':2.6,'ウルトラレア':3.4,'伝説':4.2,'神話級':5}[rarity]??1;
 }
-function chooseFish(){
- const weights=getWeights();let r=Math.random()*100;
- for(let i=0;i<fishTypes.length;i++){if(r<weights[i])return fishTypes[i];r-=weights[i];}
- return fishTypes[0];
+function getWeights(){
+ const bonus=rodBonus(save.equippedRod),isFever=currentCastFever;
+ return fishTypes.map(f=>{
+  const rodFactor=f.rarity==='ふつう'?1:(1+bonus);
+  const feverFactor=isFever?feverRarityMultiplier(f.rarity):1;
+  return f.base*rodFactor*feverFactor;
+ });
+}
+function chooseFish(excludedIds=[]){
+ const weightsByFish=getWeights();
+ const available=fishTypes.map((f,i)=>({fish:f,weight:weightsByFish[i]})).filter(x=>!excludedIds.includes(x.fish.id));
+ const sum=available.reduce((a,x)=>a+x.weight,0);let r=Math.random()*sum;
+ for(const item of available){if(r<item.weight)return item.fish;r-=item.weight;}
+ return available[0]?.fish||fishTypes[0];
 }
 function finishCatch(){
  clearTimeout(biteTimer);
  if(Math.random()<.88){
-  const f=chooseFish();const isNew=(save.caughtCounts[f.id]||0)===0;save.inventory.push(f.id);save.caughtCounts[f.id]=(save.caughtCounts[f.id]||0)+1;
-  // Fishing rewards coins immediately, based on rarity/value.
-  save.coins+=f.value;mode='reel';
-  if(isNew){sayHTML(`やったー！ <span class="new-label">NEW</span> <strong>${f.name}</strong>（<span style="color:${rarityColors[f.rarity]||'#4f9b68'};font-weight:900">${f.rarity}</span>）を釣ったよ！ ${f.value.toLocaleString()} G を手に入れた！`);}else{sayHTML(`やったー！ <strong>${f.name}</strong>（<span style="color:${rarityColors[f.rarity]||'#4f9b68'};font-weight:900">${f.rarity}</span>）を釣ったよ！ ${f.value.toLocaleString()} G を手に入れた！`);}
-  persist();setTimeout(()=>{mode='idle';updateUI();persist();},900);
- }else{mode='idle';say('あっ、逃げられちゃった…！もう一度チャレンジしよう。');updateUI();}
+  const inFever=currentCastFever;
+  const caughtFish=[chooseFish()];
+  // フィーバー中は50%で、重複しない2〜3種類の魚をまとめて釣る。
+  if(inFever&&Math.random()<.5){
+   const targetCount=Math.random()<.5?2:3;
+   while(caughtFish.length<targetCount)caughtFish.push(chooseFish(caughtFish.map(f=>f.id)));
+  }
+  const logs=[];
+  for(const [index,f] of caughtFish.entries()){
+   const isNew=(save.caughtCounts[f.id]||0)===0;
+   save.inventory.push(f.id);save.caughtCounts[f.id]=(save.caughtCounts[f.id]||0)+1;save.coins+=f.value;
+   const newTag=isNew?'<span class="new-label">NEW</span> ':'';
+   // 1匹目だけ「やったー！」を表示し、複数匹は魚ごとに改行する。
+   const cheer=index===0?'やったー！ ':'';
+   logs.push(`<div class="catch-entry">${newTag}${cheer}<strong>${f.name}</strong>を釣ったよ！ <strong>${f.value.toLocaleString()} G</strong> を手に入れた！</div>`);
+  }
+  mode='reel';
+  const prefix=caughtFish.length>1?'🎉 フィーバー大漁！ ':' ';
+  sayHTML(`${prefix}${logs.join('')}`,true);
+  persist();setTimeout(()=>{mode='idle';updateUI();persist();},1400);
+ }else{currentCastFever=false;mode='idle';say('あっ、逃げられちゃった…！もう一度チャレンジしよう。');updateUI();}
 }
 function fishing(){
  if(mode==='waiting'){say('まだかな…水面をよく見て待とう！');return;}
  if(mode==='bite'){finishCatch();return;}if(mode==='reel')return;
  if(!nearLake()){say('桟橋の上まで移動してから「つりをする」を押してね。');return;}
- fishingAttempts++;let startedFever=false;if(fishingAttempts>=nextFeverAt){feverUntil=Date.now()+30000;nextFeverAt=fishingAttempts+10+Math.floor(Math.random()*11);startedFever=true;clearTimeout(feverTimer);feverTimer=setTimeout(()=>{feverUntil=0;},30000);}
- mode='waiting';say(startedFever?'🔥 フィーバータイム！30秒間、レア魚の釣れやすさが2倍！糸をたらしたよ…アタリを待とう！':Date.now()<feverUntil?'🔥 フィーバー中！レア魚の確率2倍！糸をたらしたよ…':'糸をたらしたよ…ぷかぷか。アタリを待とう！');updateUI();
- waitTimer=setTimeout(()=>{if(mode==='waiting'){mode='bite';say('✨ ウキがぴくん！今だ、「今だ！合わせる」を押して！');updateUI();biteTimer=setTimeout(()=>{if(mode==='bite'){mode='idle';say('アタリを逃しちゃった…。また挑戦しよう！');updateUI();}},3000);}},1400+Math.random()*2800);
+ fishingAttempts++;let startedFever=false;if(feverCastsRemaining===0&&!currentCastFever&&fishingAttempts>=nextFeverAt){feverCastsRemaining=3;nextFeverAt=fishingAttempts+10+Math.floor(Math.random()*11);startedFever=true;}
+ currentCastFever=feverCastsRemaining>0;if(currentCastFever)feverCastsRemaining--;
+ mode='waiting';say(startedFever?'🔥 フィーバー開始！これから3回の釣りで、レア魚のチャンスUP！50%で2〜3種類まとめて釣れるよ！':currentCastFever?'🔥 フィーバー中！残りの釣りで高レア魚の抽選ウェイトUP、50%で2〜3種類まとめ釣り！':'糸をたらしたよ…ぷかぷか。アタリを待とう！');updateUI();
+ waitTimer=setTimeout(()=>{if(mode==='waiting'){mode='bite';say('✨ ウキがぴくん！今だ、「今だ！合わせる」を押して！');updateUI();biteTimer=setTimeout(()=>{if(mode==='bite'){currentCastFever=false;mode='idle';say('アタリを逃しちゃった…。また挑戦しよう！');updateUI();}},3000);}},1400+Math.random()*2800);
 }
 $('fishBtn').addEventListener('click',fishing);
 
