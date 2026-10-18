@@ -8,7 +8,7 @@
 <style>
 :root{--ink:#35584d;--cream:#fff9e8;--mint:#c8efd9;--green:#3d826d;--pink:#f4a6a0;--gold:#f5ce67}
 *{box-sizing:border-box}
-body{margin:0;min-height:100dvh;background:#e2f5d8;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;justify-content:center;align-items:center;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100dvh;background:#e2f5d8;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;justify-content:center;align-items:center;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 .app{width:min(100%,450px);padding:10px;display:flex;flex-direction:column;gap:8px}
 header{display:flex;justify-content:space-between;align-items:center;gap:8px}
 h1{font-size:18px;line-height:1.2;margin:0;font-weight:900;color:#32675b}
@@ -26,7 +26,7 @@ canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;touch
 #message .catch-entry{display:block;min-height:2.9em}
 .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
 .pad{display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(2,40px);gap:4px;justify-content:center}
-button{font:inherit;color:var(--ink);background:var(--cream);border:2px solid #b7d8b8;border-radius:12px;box-shadow:0 3px 0 #a6caa9;touch-action:manipulation;user-select:none;cursor:pointer}
+button{font:inherit;color:var(--ink);background:var(--cream);border:2px solid #b7d8b8;border-radius:12px;box-shadow:0 3px 0 #a6caa9;touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer}
 button:active,button.pressed{transform:translateY(2px);box-shadow:0 1px 0 #a6caa9}
 .dir{font-size:18px;font-weight:900;background:#eaf7d8}.empty{visibility:hidden}
 .actions{display:flex;flex-direction:column;gap:6px}.action{min-height:40px;font-weight:850;font-size:12px}
@@ -210,7 +210,6 @@ function drawScene(){
   if((x+y*2)%7===0)rect(x+10,y+10,2,2,'#c3e69a');
  }
 
- // 池（水面エリア：y=60〜170）
  rect(40,24,336,18,'#c5e69b');
  rect(40,42,336,14,'#f3d99a');
  rect(40,56,336,114,'#70c8d1');
@@ -218,63 +217,51 @@ function drawScene(){
   rect(x,y,10,2,'#9be0dc');
  }
 
- // 木の配置
  for(const [x,y] of [[30,8],[100,8],[180,8],[260,8],[340,8],[2,80],[2,130],[394,80],[394,130]]){
   rect(x+5,y+10,6,14,'#a56e4d');
   rect(x-2,y,20,12,'#4c9b67');
   rect(x+3,y-3,14,12,'#79bd76');
  }
 
- // 桟橋
  rect(160,150,96,42,'#b98256');
  for(let x=166;x<250;x+=16){rect(x,154,2,34,'#e0b47a');}
  rect(154,148,108,5,'#e6bd80');
  rect(154,190,108,4,'#956143');
 
- // 障害物・草むら
  for(const [x,y] of [[35,100],[375,110],[50,200],[350,205],[180,195]]){
   rect(x,y,14,8,'#a1b5a0');
   rect(x+2,y-2,10,2,'#d3d6b4');
  }
 
- // ==================== 安定したキャラクター描画 ====================
  const x=Math.round(player.x), y=Math.round(player.y);
 
- // 影
  rect(x-6, y+11, 12, 3, '#76b46b');
 
- // 耳
  rect(x-5, y-13, 3, 10, '#fff8ed');
  rect(x+2, y-13, 3, 10, '#fff8ed');
  rect(x-4, y-11, 1, 6, '#f4a6b2');
  rect(x+3, y-11, 1, 6, '#f4a6b2');
 
- // 頭
  rect(x-8, y-5, 16, 12, '#fff8ed');
  rect(x-9, y-3, 2, 7, '#fff8ed');
  rect(x+7, y-3, 2, 7, '#fff8ed');
 
- // 目
  rect(x-4, y-1, 2, 2, '#4a4947');
  rect(x+2, y-1, 2, 2, '#4a4947');
 
- // ほっぺ・鼻
  rect(x, y+1, 1, 1, '#e58f9d');
  rect(x-5, y+2, 2, 2, '#f4b7b5');
  rect(x+3, y+2, 2, 2, '#f4b7b5');
 
- // 体・服
  rect(x-6, y+7, 12, 8, '#8cc8a0');
  rect(x-7, y+8, 2, 5, '#fff8ed');
  rect(x+5, y+8, 2, 5, '#fff8ed');
  rect(x-5, y+7, 10, 2, '#f2c75e');
 
- // 足・靴
  rect(x-5, y+15, 3, 3, '#fff8ed');
  rect(x+2, y+15, 3, 3, '#fff8ed');
  rect(x-5, y+18, 4, 2, '#a97858');
  rect(x+1, y+18, 4, 2, '#a97858');
- // ==============================================================
 
  if(currentCastFever){
   rect(118,24,180,22,'#fff0a8');
