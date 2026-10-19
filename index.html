@@ -54,7 +54,7 @@ button:active,button.pressed{transform:translateY(2px);box-shadow:0 1px 0 #a6caa
 </header>
 <section class="panel active" id="gamePage">
  <div class="scene"><canvas id="game" width="416" height="260"></canvas></div>
- <div class="message" id="message">池のまわりを歩いて、釣りをしてみよう！</div>
+ <div class="message" id="message">池のまわりや桟橋を歩こう。</div>
  <nav class="tabs">
   <button class="tab active" data-page="game">🌳 つり場</button>
   <button class="tab" data-page="book">📖 さかな図鑑</button>
@@ -218,16 +218,19 @@ function drawScene(){
   rect(x,y,10,2,'#9be0dc');
  }
 
+ // --- 桟橋の描画 ---
+ rect(200, 56, 16, 114, '#c29a6b'); // 桟橋の板
+ rect(196, 56, 4, 114, '#a27a4b');  // 桟橋の左枠
+ rect(216, 56, 4, 114, '#a27a4b');  // 桟橋の右枠
+ for(let py = 64; py < 170; py += 16){
+  rect(200, py, 16, 2, '#916739'); // 板の木目線
+ }
+
  for(const [x,y] of [[30,8],[100,8],[180,8],[260,8],[340,8],[2,80],[2,130],[394,80],[394,130]]){
   rect(x+5,y+10,6,14,'#a56e4d');
   rect(x-2,y,20,12,'#4c9b67');
   rect(x+3,y-3,14,12,'#79bd76');
  }
-
- rect(160,150,96,42,'#b98256');
- for(let x=166;x<250;x+=16){rect(x,154,2,34,'#e0b47a');}
- rect(154,148,108,5,'#e6bd80');
- rect(154,190,108,4,'#956143');
 
  for(const [x,y] of [[35,100],[375,110],[50,200],[350,205],[180,195]]){
   rect(x,y,14,8,'#a1b5a0');
@@ -277,8 +280,18 @@ function drawScene(){
  }
 }
 
-const isWater=(x,y)=>x>42 && x<372 && y>58 && y<170;
-const nearLake=()=>player.x>=30 && player.x<=386 && player.y>=40 && player.y<=200 && !isWater(player.x,player.y);
+const isWater=(x,y)=>(x>42 && x<372 && y>58 && y<170) && !(x>=196 && x<=220);
+// 修正：池や桟橋のすぐ隣（上下左右8マス以内など、1〜2マス程度の距離）にいる時だけ釣りができるように判定を厳しくしました
+const nearLake = () => {
+ const px = player.x;
+ const py = player.y;
+ // 池のまわり（上下左右の隣接マス付近）または桟橋の隣接位置
+ const nearTopEdge = (px >= 36 && px <= 376 && py >= 40 && py <= 58);
+ const nearBottomEdge = (px >= 36 && px <= 376 && py >= 162 && py <= 180);
+ const nearSideEdge = ((px >= 32 && px <= 48) || (px >= 364 && px <= 380)) && (py >= 40 && py <= 180);
+ const nearPier = (px >= 180 && px <= 236 && py >= 50 && py <= 176);
+ return nearTopEdge || nearBottomEdge || nearSideEdge || nearPier;
+};
 
 function move(dir){
  if(mode!=='idle'){say('釣りの最中だよ！'); return;}
@@ -286,8 +299,8 @@ function move(dir){
  if(dir==='up') player.y-=s; if(dir==='down') player.y+=s; if(dir==='left') player.x-=s; if(dir==='right') player.x+=s;
  player.x=Math.max(24,Math.min(392,player.x)); player.y=Math.max(40,Math.min(216,player.y));
  if(isWater(player.x,player.y)){player.x=ox; player.y=oy; say('水の中には入れないよ！');}
- else if(nearLake()) say('池のほとりに着いたよ！「つりをする」を押してね。');
- else say('池のまわりの草地を歩こう。');
+ else if(nearLake()) say('釣りスポットに着いたよ！「つりをする」を押してね。');
+ else say('池のまわりや桟橋を歩こう。');
  persist();
 }
 
@@ -333,8 +346,23 @@ function finishCatch(){
 function fishing(){
  if(mode==='waiting'){say('アタリを待とう！'); return;}
  if(mode==='bite'){finishCatch(); return;}
- if(mode==='reel'||!nearLake()) return;
- do{floatPos.x=Math.round(player.x+(Math.random()-.5)*80); floatPos.y=Math.round(player.y+(Math.random()-.5)*40);} while(!isWater(floatPos.x,floatPos.y));
+ if(mode==='reel') return;
+ if(!nearLake()){
+  say('池のまわりや桟橋を歩こう。');
+  return;
+ }
+
+ let attempts=0;
+ do{
+  floatPos.x=Math.round(player.x+(Math.random()-.5)*80);
+  floatPos.y=Math.round(player.y+(Math.random()-.5)*40);
+  attempts++;
+ } while(!isWater(floatPos.x,floatPos.y) && attempts<100);
+
+ if(!isWater(floatPos.x,floatPos.y)){
+  say('池のまわりや桟橋を歩こう。');
+  return;
+ }
 
  fishingAttempts++;
  if(feverCastsRemaining===0 && !currentCastFever && fishingAttempts>=nextFeverAt){
@@ -345,7 +373,7 @@ function fishing(){
 
  waitTimer=setTimeout(()=>{
   if(mode==='waiting'){
-   mode='bite'; say('✨ ウキが動いた！「今だ！合わせる」を押して！'); updateUI();
+   mode='bite'; say('✨ ウキが動いた！「今だ!合わせる」を押して！'); updateUI();
    biteTimer=setTimeout(()=>{if(mode==='bite'){currentCastFever=false; mode='idle'; say('アタリを逃した…。'); updateUI();}},3000);
   }
  },1400+Math.random()*2800);
