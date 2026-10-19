@@ -54,7 +54,7 @@ button:active,button.pressed{transform:translateY(2px);box-shadow:0 1px 0 #a6caa
 </header>
 <section class="panel active" id="gamePage">
  <div class="scene"><canvas id="game" width="416" height="260"></canvas></div>
- <div class="message" id="message">池のまわりや桟橋を歩こう。</div>
+ <div class="message" id="message">池のまわりや桟橋で釣りをしよう。</div>
  <nav class="tabs">
   <button class="tab active" data-page="game">🌳 つり場</button>
   <button class="tab" data-page="book">📖 さかな図鑑</button>
@@ -92,30 +92,30 @@ const W=416, H=260;
 let floatPos={x:208, y:130};
 
 const fishTypes=[
-{id:'carp',name:'こい',value:8,emoji:'🐟',rarity:'ふつう',base:13.5,desc:'池でよく見かける魚。'},
-{id:'ayu',name:'あゆ',value:14,emoji:'🐠',rarity:'ふつう',base:14,desc:'きれいな水が好き。'},
+{id:'carp',name:'こい',value:8,emoji:'🐟',rarity:'ふつう',base:12,desc:'池でよく見かける魚。'},
+{id:'ayu',name:'あゆ',value:14,emoji:'🐠',rarity:'ふつう',base:12,desc:'きれいな水が好き。'},
 {id:'bluegill',name:'ブルーギル',value:24,emoji:'🐟',rarity:'ふつう',base:10,desc:'しま模様がチャームポイント。'},
 {id:'minnow',name:'めだか',value:6,emoji:'🐟',rarity:'ふつう',base:6,desc:'小さくてすばしっこい魚。'},
 {id:'crucian',name:'ふな',value:10,emoji:'🐟',rarity:'ふつう',base:5,desc:'昔から親しまれている魚。'},
 {id:'loach',name:'どじょう',value:12,emoji:'🐟',rarity:'ふつう',base:4,desc:'泥の中にかくれるのが得意。'},
-{id:'sardine',name:'いわし',value:16,emoji:'🐟',rarity:'ふつう',base:1.5,desc:'銀色の体がきらめく魚。'},
-{id:'amber_minnow',name:'こはくいわし',value:11,emoji:'🐟',rarity:'ふつう',base:1.2,desc:'琥珀色にきらめく小さな魚。'},
-{id:'trout',name:'にじます',value:45,emoji:'🐠',rarity:'ちょっとレア',base:8,desc:'きらきらした色がきれい。'},
+{id:'sardine',name:'いわし',value:16,emoji:'🐟',rarity:'ふつう',base:2,desc:'銀色の体がきらめく魚。'},
+{id:'amber_minnow',name:'こはくいわし',value:11,emoji:'🐟',rarity:'ふつう',base:1,desc:'琥珀色にきらめく小さな魚。'},
+{id:'trout',name:'にじます',value:45,emoji:'🐠',rarity:'ちょっとレア',base:4,desc:'きらきらした色がきれい。'},
 {id:'catfish',name:'なまず',value:30,emoji:'🐟',rarity:'ちょっとレア',base:3.5,desc:'ひげが特徴的な夜の魚。'},
+{id:'mackerel',name:'さば',value:22,emoji:'🐟',rarity:'ちょっとレア',base:3,desc:'青いしま模様がきれい。'},
 {id:'puffer',name:'ふぐ',value:28,emoji:'🐡',rarity:'ちょっとレア',base:2,desc:'ぷくっとふくらむ魚。'},
 {id:'eel',name:'うなぎ',value:38,emoji:'🐟',rarity:'ちょっとレア',base:1.8,desc:'細長い体ですいすい泳ぐ。'},
-{id:'mackerel',name:'さば',value:22,emoji:'🐟',rarity:'ちょっとレア',base:1.5,desc:'青いしま模様がきれい。'},
 {id:'shrimp',name:'えび',value:18,emoji:'🦐',rarity:'ちょっとレア',base:1.1,desc:'ぴょんとはねる小さな生き物。'},
 {id:'crab',name:'かに',value:32,emoji:'🦀',rarity:'ちょっとレア',base:1,desc:'横歩きが得意。'},
 {id:'amago',name:'あまご',value:34,emoji:'🐠',rarity:'ちょっとレア',base:0.75,desc:'清流にすむ、斑点模様の魚。'},
-{id:'goldfish',name:'きんぎょ',value:75,emoji:'🐡',rarity:'レア',base:7,desc:'あざやかな色の人気者。'},
+{id:'goldfish',name:'きんぎょ',value:75,emoji:'🐡',rarity:'レア',base:3,desc:'あざやかな色の人気者。'},
 {id:'piranha',name:'ピラニア',value:55,emoji:'🐠',rarity:'レア',base:3,desc:'鋭い歯を持つ熱帯の魚。'},
 {id:'salmon',name:'さけ',value:48,emoji:'🐠',rarity:'レア',base:1.4,desc:'川をのぼる力強い魚。'},
 {id:'tuna',name:'まぐろ',value:85,emoji:'🐟',rarity:'レア',base:1.3,desc:'泳ぐスピードが速い大きな魚。'},
 {id:'octopus',name:'たこ',value:65,emoji:'🐙',rarity:'レア',base:1.2,desc:'八本の足で器用に動く。'},
 {id:'squid',name:'いか',value:52,emoji:'🦑',rarity:'レア',base:1.2,desc:'水の中をすばやく泳ぐ。'},
-{id:'jellyfish',name:'くらげ',value:42,emoji:'🎐',rarity:'レア',base:0.9,desc:'水の中をふわふわ漂う。'},
-{id:'red_eye',name:'あかめ',value:130,emoji:'🐟',rarity:'レア',base:0.65,desc:'赤く輝く目を持つ珍しい魚。'},
+{id:'jellyfish',name:'くらげ',value:42,emoji:'🎐',rarity:'レア',base:1,desc:'水の中をふわふわ漂う。'},
+{id:'red_eye',name:'あかめ',value:130,emoji:'🐟',rarity:'レア',base:1,desc:'赤く輝く目を持つ珍しい魚。'},
 {id:'koi_gold',name:'黄金のこい',value:100,emoji:'🐠',rarity:'ウルトラレア',base:2.5,desc:'金色に輝く縁起のいい魚。'},
 {id:'rainbow',name:'にじいろフィッシュ',value:120,emoji:'🐠',rarity:'ウルトラレア',base:2,desc:'体に虹のような色が浮かぶ。'},
 {id:'seahorse',name:'たつのおとしご',value:90,emoji:'🐠',rarity:'ウルトラレア',base:0.8,desc:'馬のような顔をした不思議な魚。'},
@@ -126,10 +126,10 @@ const fishTypes=[
 {id:'coelacanth',name:'シーラカンス',value:260,emoji:'🐟',rarity:'伝説',base:0.5,desc:'生きた化石と呼ばれる魚。'},
 {id:'starlight',name:'ほしぞら魚',value:320,emoji:'🐠',rarity:'伝説',base:0.5,desc:'夜空の星のように光る幻の魚。'},
 {id:'crystal',name:'クリスタルフィッシュ',value:500,emoji:'🐡',rarity:'伝説',base:0.4,desc:'透き通った体が宝石のよう。'},
-{id:'phoenix',name:'ほうおう魚',value:1200,emoji:'🐠',rarity:'神話級',base:0.18,desc:'炎の羽のようなひれを持つ幻の魚。'},
+{id:'phoenix',name:'ほうおう魚',value:1200,emoji:'🐠',rarity:'神話級',base:0.15,desc:'炎の羽のようなひれを持つ幻の魚。'},
 {id:'unicorn',name:'ユニコーンフィッシュ',value:2500,emoji:'🦄',rarity:'神話級',base:0.10,desc:'虹色の角がきらめく奇跡の魚。'},
-{id:'cosmic',name:'うちゅうの主',value:5000,emoji:'🌌',rarity:'神話級',base:0.045,desc:'星々の海から現れる究極の幻。'},
-{id:'sacred_whale',name:'せいなるくじら',value:10000,emoji:'🐋',rarity:'神話級',base:0.02,desc:'伝説のさらに先にいる、神聖な巨魚。'}
+{id:'cosmic',name:'うちゅうの主',value:5000,emoji:'🌌',rarity:'神話級',base:0.04,desc:'星々の海から現れる究極の幻。'},
+{id:'sacred_whale',name:'せいなるくじら',value:10000,emoji:'🐋',rarity:'神話級',base:0.015,desc:'伝説のさらに先にいる、神聖な巨魚。'}
 ];
 
 const rods=[
@@ -151,17 +151,17 @@ const rods=[
 
 const rarityColors={'ふつう':'#4f9b68','ちょっとレア':'#3986c5','レア':'#9661c9','ウルトラレア':'#e58b32','伝説':'#d34f85','神話級':'#e53935'};
 const rarityOrder={'ふつう':0,'ちょっとレア':1,'レア':2,'ウルトラレア':3,'伝説':4,'神話級':5};
-const defSave={coins:100,caughtCounts:{},inventory:[],ownedRods:[0],equippedRod:0,player:{x:208,y:200}};
+const defSave={coins:100,caughtCounts:{},giantCounts:{},inventory:[],ownedRods:[0],equippedRod:0,player:{x:208,y:200}};
 
-let save=JSON.parse(localStorage.getItem('pokapokaFishingSaveV2')||JSON.stringify(defSave));
-save={...defSave, ...save, caughtCounts:save.caughtCounts||{}, inventory:save.inventory||[], ownedRods:save.ownedRods||[0]};
+let save=JSON.parse(localStorage.getItem('pokapokaFishingSaveV3')||JSON.stringify(defSave));
+save={...defSave, ...save, caughtCounts:save.caughtCounts||{}, giantCounts:save.giantCounts||{}, inventory:save.inventory||[], ownedRods:save.ownedRods||[0]};
 
 let mode='idle', biteTimer=null, waitTimer=null, fishingAttempts=0;
 let nextFeverAt=10+Math.floor(Math.random()*11), feverCastsRemaining=0, currentCastFever=false;
 const player={...save.player};
 if(player.y>220) player.y=200;
 
-const persist=()=>{save.player={x:player.x,y:player.y}; localStorage.setItem('pokapokaFishingSaveV2',JSON.stringify(save)); updateUI();};
+const persist=()=>{save.player={x:player.x,y:player.y}; localStorage.setItem('pokapokaFishingSaveV3',JSON.stringify(save)); updateUI();};
 const say=(t,html=false)=>{const m=$('message'); m.classList.toggle('catch-log',html); m[html?'innerHTML':'textContent']=t;};
 const totalCaught=()=>Object.values(save.caughtCounts).reduce((a,b)=>a+b,0);
 const rodBonus=i=>rods[i].power*0.25;
@@ -182,7 +182,9 @@ function renderBook(){
  $('bookProgress').textContent=`${known} / ${fishTypes.length} 種`;
  [...fishTypes].sort((a,b)=>(rarityOrder[a.rarity]??99)-(rarityOrder[b.rarity]??99)||a.value-b.value).forEach(f=>{
   const n=save.caughtCounts[f.id]||0, yes=n>0;
-  grid.innerHTML+=`<article class="fishcard"><div class="fishicon ${yes?'':'unknown'}">${yes?f.emoji:'❔'}</div><div><div class="fishname">${yes?f.name:'？？？'}</div><div class="rarity" style="color:${rarityColors[f.rarity]}">${yes?f.rarity:'未発見'}</div><div class="fishdesc">${yes?`${f.desc}<br>価格：${f.value} G<br>釣った数：${n}匹`:'まだ出会っていない魚'}</div></div></article>`;
+  const hasGiant=(save.giantCounts[f.id]||0)>0;
+  const displayName = yes ? f.name + (hasGiant ? ' ★' : '') : '？？？';
+  grid.innerHTML+=`<article class="fishcard"><div class="fishicon ${yes?'':'unknown'}">${yes?f.emoji:'❔'}</div><div><div class="fishname">${displayName}</div><div class="rarity" style="color:${rarityColors[f.rarity]}">${yes?f.rarity:'未発見'}</div><div class="fishdesc">${yes?`${f.desc}<br>価格：${f.value} G<br>釣った数：${n}匹`:'まだ出会っていない魚'}</div></div></article>`;
  });
 }
 
@@ -218,12 +220,11 @@ function drawScene(){
   rect(x,y,10,2,'#9be0dc');
  }
 
- // --- 桟橋の描画 ---
- rect(200, 56, 16, 114, '#c29a6b'); // 桟橋の板
- rect(196, 56, 4, 114, '#a27a4b');  // 桟橋の左枠
- rect(216, 56, 4, 114, '#a27a4b');  // 桟橋の右枠
+ rect(200, 56, 16, 114, '#c29a6b');
+ rect(196, 56, 4, 114, '#a27a4b');
+ rect(216, 56, 4, 114, '#a27a4b');
  for(let py = 64; py < 170; py += 16){
-  rect(200, py, 16, 2, '#916739'); // 板の木目線
+  rect(200, py, 16, 2, '#916739');
  }
 
  for(const [x,y] of [[30,8],[100,8],[180,8],[260,8],[340,8],[2,80],[2,130],[394,80],[394,130]]){
@@ -281,11 +282,9 @@ function drawScene(){
 }
 
 const isWater=(x,y)=>(x>42 && x<372 && y>58 && y<170) && !(x>=196 && x<=220);
-// 修正：池や桟橋のすぐ隣（上下左右8マス以内など、1〜2マス程度の距離）にいる時だけ釣りができるように判定を厳しくしました
 const nearLake = () => {
  const px = player.x;
  const py = player.y;
- // 池のまわり（上下左右の隣接マス付近）または桟橋の隣接位置
  const nearTopEdge = (px >= 36 && px <= 376 && py >= 40 && py <= 58);
  const nearBottomEdge = (px >= 36 && px <= 376 && py >= 162 && py <= 180);
  const nearSideEdge = ((px >= 32 && px <= 48) || (px >= 364 && px <= 380)) && (py >= 40 && py <= 180);
@@ -300,7 +299,7 @@ function move(dir){
  player.x=Math.max(24,Math.min(392,player.x)); player.y=Math.max(40,Math.min(216,player.y));
  if(isWater(player.x,player.y)){player.x=ox; player.y=oy; say('水の中には入れないよ！');}
  else if(nearLake()) say('釣りスポットに着いたよ！「つりをする」を押してね。');
- else say('池のまわりや桟橋を歩こう。');
+ else say('池のまわりや桟橋で釣りをしよう。');
  persist();
 }
 
@@ -329,12 +328,26 @@ function finishCatch(){
   if(currentCastFever && Math.random()<.5){
    while(fishes.length<(Math.random()<.5?2:3)) fishes.push(chooseFish(fishes.map(f=>f.id)));
   }
-  const multiplier = currentCastFever ? 2 : 1;
+  const feverMultiplier = currentCastFever ? 2 : 1;
   const logs=fishes.map((f,i)=>{
    const isNew=!(save.caughtCounts[f.id]);
-   const earnedG = f.value * multiplier;
-   save.inventory.push(f.id); save.caughtCounts[f.id]=(save.caughtCounts[f.id]||0)+1; save.coins+=earnedG;
-   return `<div class="catch-entry">${isNew?'<span class="new-label">NEW</span>':''}${i===0?'やったー！':''}<strong>${f.name}</strong>を釣った！ <strong>${earnedG} G${currentCastFever?' (フィーバー2倍!)':''}</strong>ゲット！</div>`;
+   // 10%の確率で巨大な魚にする
+   const isGiant = Math.random() < 0.10;
+   const giantMultiplier = isGiant ? 2 : 1;
+   
+   if(isGiant){
+    save.giantCounts[f.id] = (save.giantCounts[f.id] || 0) + 1;
+   }
+
+   const earnedG = f.value * feverMultiplier * giantMultiplier;
+   save.inventory.push(f.id); 
+   save.caughtCounts[f.id]=(save.caughtCounts[f.id]||0)+1; 
+   save.coins+=earnedG;
+
+   const sizeText = isGiant ? '【巨大】' : '';
+   const extraText = (currentCastFever && isGiant) ? ' (ボーナス4倍!)' : currentCastFever ? ' (ボーナス2倍!)' : isGiant ? ' (ボーナス2倍!)' : '';
+
+   return `<div class="catch-entry">${isNew?'<span class="new-label">NEW</span>':''}${i===0?'やったー！':''}<strong>${sizeText}${f.name}</strong>を釣った！ <strong>${earnedG} G${extraText}</strong>ゲット！</div>`;
   });
   mode='reel'; say(`${fishes.length>1?'🎉 大漁！':''} ${logs.join('')}`, true);
   persist(); setTimeout(()=>{mode='idle'; updateUI();},1400);
@@ -348,7 +361,7 @@ function fishing(){
  if(mode==='bite'){finishCatch(); return;}
  if(mode==='reel') return;
  if(!nearLake()){
-  say('池のまわりや桟橋を歩こう。');
+  say('池のまわりや桟橋で釣りをしよう。');
   return;
  }
 
@@ -360,7 +373,7 @@ function fishing(){
  } while(!isWater(floatPos.x,floatPos.y) && attempts<100);
 
  if(!isWater(floatPos.x,floatPos.y)){
-  say('池のまわりや桟橋を歩こう。');
+  say('池のまわりや桟橋で釣りをしよう。');
   return;
  }
 
@@ -373,7 +386,7 @@ function fishing(){
 
  waitTimer=setTimeout(()=>{
   if(mode==='waiting'){
-   mode='bite'; say('✨ ウキが動いた！「今だ!合わせる」を押して！'); updateUI();
+   mode='bite'; say('✨ ウキが動いた！「今だ！合わせる」を押して！'); updateUI();
    biteTimer=setTimeout(()=>{if(mode==='bite'){currentCastFever=false; mode='idle'; say('アタリを逃した…。'); updateUI();}},3000);
   }
  },1400+Math.random()*2800);
