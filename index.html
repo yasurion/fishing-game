@@ -151,9 +151,10 @@ const rods=[
 
 const rarityColors={'ふつう':'#4f9b68','ちょっとレア':'#3986c5','レア':'#9661c9','ウルトラレア':'#e58b32','伝説':'#d34f85','神話級':'#e53935'};
 const rarityOrder={'ふつう':0,'ちょっとレア':1,'レア':2,'ウルトラレア':3,'伝説':4,'神話級':5};
+
 const defSave={coins:100,caughtCounts:{},giantCounts:{},inventory:[],ownedRods:[0],equippedRod:0,player:{x:208,y:200}};
 
-let save=JSON.parse(localStorage.getItem('pokapokaFishingSaveV3')||JSON.stringify(defSave));
+let save=JSON.parse(localStorage.getItem('pokapokaFishingSaveV2')||JSON.stringify(defSave));
 save={...defSave, ...save, caughtCounts:save.caughtCounts||{}, giantCounts:save.giantCounts||{}, inventory:save.inventory||[], ownedRods:save.ownedRods||[0]};
 
 let mode='idle', biteTimer=null, waitTimer=null, fishingAttempts=0;
@@ -161,7 +162,7 @@ let nextFeverAt=10+Math.floor(Math.random()*11), feverCastsRemaining=0, currentC
 const player={...save.player};
 if(player.y>220) player.y=200;
 
-const persist=()=>{save.player={x:player.x,y:player.y}; localStorage.setItem('pokapokaFishingSaveV3',JSON.stringify(save)); updateUI();};
+const persist=()=>{save.player={x:player.x,y:player.y}; localStorage.setItem('pokapokaFishingSaveV2',JSON.stringify(save)); updateUI();};
 const say=(t,html=false)=>{const m=$('message'); m.classList.toggle('catch-log',html); m[html?'innerHTML':'textContent']=t;};
 const totalCaught=()=>Object.values(save.caughtCounts).reduce((a,b)=>a+b,0);
 const rodBonus=i=>rods[i].power*0.25;
