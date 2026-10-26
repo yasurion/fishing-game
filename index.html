@@ -45,12 +45,19 @@ button:active,button.pressed{transform:translateY(2px);box-shadow:0 1px 0 #a6caa
 .rodcard button:disabled{opacity:.5}
 .bar{height:4px;background:#dbe9d7;border-radius:999px;overflow:hidden;margin-top:4px}.bar span{display:block;height:100%;background:#e7b84f}
 .smallnote{text-align:center;font-size:11px;color:#628477}
+.saveManageButton{padding:8px 12px;font-size:12px;font-weight:850;white-space:nowrap}
+.savePanel{border:2px solid #c4e1bd;border-radius:14px;background:var(--cream);padding:12px;display:flex;flex-direction:column;gap:10px}
+.saveActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.saveActions button{padding:12px 6px;font-size:13px;font-weight:850}
+.saveHint{font-size:12px;line-height:1.6;color:#628477}
+#saveMessage{font-size:12px;line-height:1.5;min-height:20px;white-space:pre-wrap}
+#saveImport{display:none}
 </style>
 </head>
 <body>
 <main class="app">
 <header>
- <div><h1>🌷 ぽかぽか つりの森</h1><div class="subtitle">うさぎさんと、のんびり釣り暮らし。</div></div>
+ <div><h1>🌷 ぽかぽか つりの森</h1><div class="subtitle">うさぎさんと、のんびり釣り暮らし。</div></div><button class="saveManageButton" id="openSaveManage" type="button">⚙️ セーブ管理</button>
 </header>
 <section class="panel active" id="gamePage">
  <div class="scene"><canvas id="game" width="416" height="260"></canvas></div>
@@ -82,6 +89,17 @@ button:active,button.pressed{transform:translateY(2px);box-shadow:0 1px 0 #a6caa
  <div class="message">高い釣り竿ほどレアな魚が釣れやすいよ。買った竿は「装備する」を押してね。</div>
  <div class="rodGrid" id="rodGrid"></div>
  <button class="action" data-goto="game">🌳 つり場にもどる</button>
+</section>
+<section class="panel" id="savePage">
+ <div class="booktop"><span>⚙️ セーブ管理</span></div>
+ <div class="savePanel">
+  <div class="saveHint">セーブデータをファイルに書き出しておくと、別のブラウザやスマートフォンでも続きを遊べます。</div>
+  <div class="saveActions"><button id="exportSave" type="button">📥 書き出す</button><button id="importSave" type="button">📤 読み込む</button></div>
+  <input id="saveImport" type="file" accept=".json,application/json">
+  <div class="saveHint">読み込むと、このブラウザの現在のセーブデータは上書きされます。先に「書き出す」でバックアップしてください。</div>
+  <div id="saveMessage" role="status" aria-live="polite"></div>
+ </div>
+ <button class="action" data-goto="game" type="button">🌳 つり場にもどる</button>
 </section>
 </main>
 <script>
@@ -163,6 +181,54 @@ const player={...save.player};
 if(player.y>220) player.y=200;
 
 const persist=()=>{save.player={x:player.x,y:player.y}; localStorage.setItem('pokapokaFishingSaveV2',JSON.stringify(save)); updateUI();};
+ const saveKey='pokapokaFishingSaveV2';
+ const saveFeedback=(message)=>{$('saveMessage').textContent=message;};
+ $('openSaveManage').addEventListener('click',()=>{
+  document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
+  $('savePage').classList.add('active');
+  saveFeedback('');
+ });
+ $('exportSave').addEventListener('click',()=>{
+  try{
+   save.player={x:player.x,y:player.y};
+   localStorage.setItem(saveKey,JSON.stringify(save));
+   const data={format:'pokapoka-fishing-save',version:1,exportedAt:new Date().toISOString(),save};
+   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+   const url=URL.createObjectURL(blob);
+   const link=document.createElement('a');
+   link.href=url;
+   link.download='pokapoka-fishing-save-'+new Date().toISOString().slice(0,10)+'.json';
+   document.body.appendChild(link);link.click();link.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),60000);
+   saveFeedback('セーブデータを書き出しました。ファイルを安全な場所に保管してください。');
+  }catch(error){saveFeedback('書き出しに失敗しました。ブラウザの保存設定をご確認ください。');}
+ });
+ $('importSave').addEventListener('click',()=>{$('saveImport').value='';$('saveImport').click();});
+ $('saveImport').addEventListener('change',async(event)=>{
+  const file=event.target.files?.[0];if(!file)return;
+  try{
+   if(file.size>2*1024*1024)throw new Error('ファイルが大きすぎます。');
+   const parsed=JSON.parse(await file.text());
+   if(!parsed || parsed.format!=='pokapoka-fishing-save'||parsed.version!==1)throw new Error('このゲームのセーブファイルではありません。');
+   const incoming=parsed.save;
+   const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+   const validCounts=v=>isRecord(v)&&Object.entries(v).every(([k,n])=>fishTypes.some(f=>f.id===k)&&Number.isSafeInteger(n)&&n>=0);
+   if(!isRecord(incoming)||!Number.isSafeInteger(incoming.coins)||incoming.coins<0||
+      !validCounts(incoming.caughtCounts)||!validCounts(incoming.giantCounts)||
+      !Array.isArray(incoming.ownedRods)||incoming.ownedRods.length===0||
+      !incoming.ownedRods.every(i=>Number.isInteger(i)&&i>=0&&i<rods.length)||
+      !Number.isInteger(incoming.equippedRod)||!incoming.ownedRods.includes(incoming.equippedRod)||
+      !isRecord(incoming.player)||!Number.isFinite(incoming.player.x)||!Number.isFinite(incoming.player.y)||
+      incoming.player.x<24||incoming.player.x>392||incoming.player.y<40||incoming.player.y>216)
+     throw new Error('セーブデータの内容が正しくありません。');
+   if(!confirm('現在のセーブデータを上書きします。よろしいですか？\n※元に戻せないため、必要なら先に書き出してください。'))return;
+   const restored={...defSave,...incoming,caughtCounts:{...incoming.caughtCounts},giantCounts:{...incoming.giantCounts},ownedRods:[...incoming.ownedRods],inventory:Array.isArray(incoming.inventory)?incoming.inventory.filter(id=>fishTypes.some(f=>f.id===id)):[]};
+   localStorage.setItem(saveKey,JSON.stringify(restored));
+   saveFeedback('読み込みが完了しました。ゲームを再読み込みします。');
+   location.reload();
+  }catch(error){saveFeedback('読み込みに失敗しました：'+(error.message||'ファイルを確認してください。'));}
+ });
+
 const say=(t,html=false)=>{const m=$('message'); m.classList.toggle('catch-log',html); m[html?'innerHTML':'textContent']=t;};
 const totalCaught=()=>Object.values(save.caughtCounts).reduce((a,b)=>a+b,0);
 const rodBonus=i=>rods[i].power*0.25;
