@@ -185,7 +185,7 @@ function renderBook(){
   const n=save.caughtCounts[f.id]||0, yes=n>0;
   const hasGiant=(save.giantCounts[f.id]||0)>0;
   const displayName = yes ? f.name + (hasGiant ? ' ★' : '') : '？？？';
-  grid.innerHTML+=`<article class="fishcard"><div class="fishicon ${yes?'':'unknown'}">${yes?f.emoji:'❔'}</div><div><div class="fishname">${displayName}</div><div class="rarity" style="color:${rarityColors[f.rarity]}">${yes?f.rarity:'未発見'}</div><div class="fishdesc">${yes?`${f.desc}<br>価格：${f.value} G<br>釣った数：${n}匹`:'まだ出会っていない魚'}</div></div></article>`;
+  grid.innerHTML+=`<article class="fishcard"><div class="fishicon ${yes?'':'unknown'}">${yes?f.emoji:'❔'}</div><div><div class="fishname">${displayName}</div><div class="rarity" style="color:${rarityColors[f.rarity]}">${yes?f.rarity:'未発見'}</div><div class="fishdesc">${yes?`${f.desc}<br>価格：${f.value} G<br>釣った数：${n}匹 (巨大魚${save.giantCounts[f.id]||0}匹)`:'まだ出会っていない魚'}</div></div></article>`;
  });
 }
 
